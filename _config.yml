@@ -1,0 +1,12 @@
+# GitHub Pages Configuration
+title: "Redirect Service"
+description: "A simple redirect service with bot protection"
+
+# GitHub Pages settings
+plugins:
+  - jekyll-sitemap
+
+# Exclude files from processing
+exclude:
+  - README.md
+  - .gitignore
