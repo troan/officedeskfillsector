@@ -33,24 +33,12 @@
             }
         }
         
-        // Check for headless browser indicators
+        // Check for obvious automation indicators only
         if (navigator.webdriver === true) return true;
-        if (window.navigator.plugins.length === 0) return true;
-        if (!window.chrome && navigator.userAgent.includes('Chrome')) return true;
-        
-        // Check for automation indicators
         if (window.callPhantom || window._phantom || window.phantom) return true;
-        if (window.Buffer) return true;
-        if (window.emit) return true;
-        if (window.spawn) return true;
         
-        // Check screen dimensions (typical bot values)
+        // Check screen dimensions (only extreme cases)
         if (screen.width === 0 || screen.height === 0) return true;
-        if (screen.width === 1024 && screen.height === 768) return true;
-        
-        // Check for missing properties that real browsers have
-        if (!navigator.languages || navigator.languages.length === 0) return true;
-        if (!navigator.platform) return true;
         
         return false;
     }
@@ -205,39 +193,14 @@
             return;
         }
         
-        // Detect bots and block them
-        if (detectBot() || checkReferrer()) {
+        // Only block obvious bots, not legitimate browsers
+        if (detectBot()) {
             blockBot();
             return;
         }
         
-        // Check if this is a real user interaction
-        let hasInteracted = false;
-        const interactionEvents = ['click', 'keydown', 'touchstart', 'mousemove'];
-        
-        interactionEvents.forEach(event => {
-            document.addEventListener(event, () => {
-                hasInteracted = true;
-            }, { once: true });
-        });
-        
-        // Small delay to allow for interaction detection
-        setTimeout(() => {
-            if (!hasInteracted) {
-                // Likely a bot - show fake content
-                blockBot();
-            } else {
-                // Real user - proceed with redirect
-                startRedirect();
-            }
-        }, 100);
-        
-        // Fallback: if no interaction after 2 seconds, assume real user
-        setTimeout(() => {
-            if (!hasInteracted) {
-                startRedirect();
-            }
-        }, 2000);
+        // For legitimate browsers, proceed with redirect
+        startRedirect();
     }
     
     // Handle different loading scenarios
